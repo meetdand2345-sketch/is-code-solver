@@ -1,0 +1,12 @@
+# Render.com blueprint — deploys the FastAPI app as a web service.
+services:
+  - type: web
+    name: is-code-solver
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.4"

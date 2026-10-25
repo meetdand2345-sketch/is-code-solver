@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IS Code Solver — Structural / RCC Design with IS Codes</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">IS</div>
+      <div>
+        <h1 data-i18n="app_title">IS Code Solver</h1>
+        <p class="tagline" data-i18n="app_subtitle">Structural &amp; RCC problems, solved with IS code references</p>
+      </div>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button id="lang-en" class="lang-btn active" onclick="setLang('en')">English</button>
+      <button id="lang-hi" class="lang-btn" onclick="setLang('hi')">हिंदी</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="ask" onclick="showTab('ask')" data-i18n="tab_ask">Ask a Question</button>
+    <button class="tab" data-tab="tools" onclick="showTab('tools')" data-i18n="tab_tools">Design Tools</button>
+    <button class="tab" data-tab="library" onclick="showTab('library')" data-i18n="tab_library">IS Code Library</button>
+  </nav>
+
+  <main>
+    <!-- ASK ------------------------------------------------------------ -->
+    <section id="panel-ask" class="panel active">
+      <div class="card">
+        <label class="field-label" for="question" data-i18n="ask_label">Type your engineering question</label>
+        <textarea id="question" rows="4"
+          placeholder="e.g. Design a simply supported beam, b=300 mm, D=500 mm, fck=25, fy=500, Mu=120 kNm"></textarea>
+        <div class="row">
+          <button class="primary" onclick="askQuestion()" data-i18n="ask_btn">Solve</button>
+          <span class="hint" data-i18n="ask_hint">Mention the member and the values you know (e.g. b=300, fck=25, Mu=120 kNm).</span>
+        </div>
+        <div class="examples">
+          <span data-i18n="examples_label">Try:</span>
+          <button class="chip" onclick="fillExample(this)">Design a slab, span 4 m, live load 3 kN/m2, fck 25, fy 500</button>
+          <button class="chip" onclick="fillExample(this)">Shear design of a beam b=250 d=450 Vu=90 kN Ast=942 fck=20 fy=415</button>
+          <button class="chip" onclick="fillExample(this)">Development length of 16 mm deformed bar in M25 concrete, Fe500, tension</button>
+          <button class="chip" onclick="fillExample(this)">Factored load for dead load 6 and live load 3 kN/m</button>
+        </div>
+      </div>
+      <div id="ask-result" class="result"></div>
+    </section>
+
+    <!-- TOOLS ---------------------------------------------------------- -->
+    <section id="panel-tools" class="panel">
+      <div class="card">
+        <label class="field-label" for="ptype" data-i18n="tools_label">Choose a design problem</label>
+        <select id="ptype" onchange="renderForm()"></select>
+        <div id="form-area" class="form-area"></div>
+        <div class="row">
+          <button class="primary" onclick="runTool()" data-i18n="tools_btn">Compute</button>
+        </div>
+      </div>
+      <div id="tool-result" class="result"></div>
+    </section>
+
+    <!-- LIBRARY -------------------------------------------------------- -->
+    <section id="panel-library" class="panel">
+      <div class="card">
+        <p class="hint" data-i18n="lib_intro">The codes this app draws on. Each entry links to a public reference copy and to the official BIS source.</p>
+      </div>
+      <div id="library" class="library"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span data-i18n="footer_note">Reference tool for study &amp; preliminary design. Always verify against the current BIS code. Not a substitute for a licensed engineer.</span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
