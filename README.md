@@ -32,10 +32,12 @@ so the numbers and clause references are reproducible and auditable.
 | `development` | Development length Ld and lap length | IS 456 Cl. 26.2.1, 26.2.1.1, 26.2.5.1 |
 | `loads` | Factored design load and load combinations | IS 456 Cl. 36.4.1 (Table 18), IS 875 Parts 1/2/5 |
 | `column_axial` | Short axially loaded column: required steel or capacity check | IS 456 Cl. 39.3, 26.5.3.1 |
+| `mix_design` | Concrete mix proportioning: target strength, w/c, water, cement and aggregate contents | IS 10262 Cl. 4.2, 5.1–5.8 (Tables 1–5), IS 456 Table 5 |
 
 ### Codes in the library
 
 - **IS 456:2000** — Plain and Reinforced Concrete — Code of Practice
+- **IS 10262:2019** — Concrete Mix Proportioning — Guidelines
 - **IS 1786:2008** — High Strength Deformed Steel Bars and Wires for Concrete Reinforcement
 - **IS 875 (Part 1):1987** — Dead Loads (unit weights)
 - **IS 875 (Part 2):1987** — Imposed Loads
@@ -101,7 +103,7 @@ app/
   solvers/
     common.py        shared helpers + IS 456 tables (19, 20, bond, xu,max)
     registry.py      problem-type catalogue, dispatcher, question parser
-    flexure.py  slab.py  shear.py  development.py  loads.py  column.py
+    flexure.py  slab.py  shear.py  development.py  loads.py  column.py  mix_design.py
   static/            index.html, style.css, app.js (the web UI)
 tests/               pytest suite
 ```

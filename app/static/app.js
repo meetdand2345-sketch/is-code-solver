@@ -205,6 +205,11 @@ function renderSolution(d) {
     ? `<div class="warnings"><b>⚠</b><ul>${d.warnings.map((w) => `<li>${L(w)}</li>`).join("")}</ul></div>`
     : "";
 
+  const mixTable = (d.mix_table && d.mix_table.length)
+    ? `<div class="field-label">${LANG === 'hi' ? 'मात्राएँ (प्रति घन मीटर)' : 'Quantities (per m³)'}</div>
+       <div class="inputs-grid">${d.mix_table.map((r) => `<div class="input-pill"><b>${escapeHtml(L(r.item))}</b>${r.value} ${r.unit || ''}</div>`).join('')}</div>`
+    : "";
+
   const steps = (d.steps || []).map((s) => {
     const formula = s.formula ? `<div class="formula">${escapeHtml(s.formula)}</div>` : "";
     const subst = s.substitution ? `<div class="subst">${escapeHtml(L(s.substitution))}</div>` : "";
@@ -223,6 +228,7 @@ function renderSolution(d) {
     ${warnings}
     <div class="field-label">${ui("inputs")}</div>
     <div class="inputs-grid">${inputs}</div>
+    ${mixTable}
     <div class="field-label">${ui("steps")}</div>
     ${steps}
   </div>`;

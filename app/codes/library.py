@@ -23,6 +23,9 @@ LAW_456 = "https://law.resource.org/pub/in/bis/S03/is.456.2000.pdf"
 LAW_1786 = "https://law.resource.org/pub/in/bis/S03/is.1786.2008.pdf"
 LAW_CED37 = "https://law.resource.org/pub/in/bis/manifest.ced.37.html"
 INFRALENS_456 = "https://infralens.in/code/IS-456-2000/clauses"
+ARCHIVE_10262 = "https://archive.org/details/gov.in.is.10262.2019"
+BIS_10262 = "https://www.services.bis.gov.in/php/BIS_2.0/bisconnect/knowyourstandards/Indian_standards/isdetails/MTA4Mw=="
+INFRALENS_10262 = "https://infralens.in/code/IS-10262-2019"
 
 
 def _links(bis_num, public=None, clause_browser=None):
@@ -394,6 +397,103 @@ CODES = {
                     "hi": "स्थायी, आरोपित, पवन एवं अन्य भारों के संयोजन के नियम, जिनमें एक साथ अधिकतम होने की घटी प्रायिकता सम्मिलित है।",
                 },
             }
+        ],
+    },
+    "IS10262": {
+        "id": "IS10262",
+        "number": "IS 10262:2019",
+        "title": {
+            "en": "Concrete Mix Proportioning — Guidelines",
+            "hi": "कंक्रीट मिश्रण अनुपातन — दिशानिर्देश",
+        },
+        "revision": "Second Revision",
+        "committee": "CED 02 — Cement and Concrete",
+        "scope": {
+            "en": "Step-by-step guidelines for proportioning concrete mixes (ordinary, standard and high-strength grades) to meet strength, workability and durability requirements. Provides the target-strength formula, water-cement ratio, water and cement content, and aggregate proportions, aligned with IS 456:2000.",
+            "hi": "सामर्थ्य, कार्यशीलता एवं टिकाऊपन की आवश्यकताओं की पूर्ति हेतु कंक्रीट मिश्रण के अनुपातन हेतु चरण-दर-चरण दिशानिर्देश (साधारण, मानक एवं उच्च-सामर्थ्य ग्रेड)। लक्ष्य-सामर्थ्य सूत्र, जल-सीमेंट अनुपात, जल एवं सीमेंट मात्रा तथा गिट्टी अनुपात देता है, जो IS 456:2000 के अनुरूप है।",
+        },
+        "links": _links("is10262", public=ARCHIVE_10262, clause_browser=INFRALENS_10262),
+        "clauses": [
+            {
+                "number": "1.2",
+                "title": {"en": "Applicability", "hi": "प्रयोज्यता"},
+                "summary": {
+                    "en": "Applies to ordinary, standard and high-strength concrete grades; also covers self-compacting and mass concrete.",
+                    "hi": "साधारण, मानक एवं उच्च-सामर्थ्य कंक्रीट ग्रेड पर लागू; स्व-संपीडक एवं द्रव्यमान कंक्रीट भी समाहित।",
+                },
+            },
+            {
+                "number": "4.1",
+                "title": {"en": "Data required for mix proportioning", "hi": "मिश्रण अनुपातन हेतु आवश्यक आँकड़े"},
+                "summary": {
+                    "en": "Grade designation, type of cement, nominal maximum size of aggregate, exposure/durability limits, workability, degree of site control, and aggregate types.",
+                    "hi": "ग्रेड नाम, सीमेंट प्रकार, गिट्टी का नाममात्र अधिकतम आकार, अनावरण/टिकाऊपन सीमाएँ, कार्यशीलता, साइट नियंत्रण की कोटि तथा गिट्टी प्रकार।",
+                },
+            },
+            {
+                "number": "4.2",
+                "title": {"en": "Target mean strength (Tables 1 & 2)", "hi": "लक्ष्य माध्य सामर्थ्य (तालिका 1 एवं 2)"},
+                "summary": {
+                    "en": "f'ck = fck + 1.65 S or fck + X, whichever is higher. X (Table 1): M10–M15 5.0, M20–M25 5.5, M30–M60 6.5, M65+ 8.0. Assumed S (Table 2): M10–M15 3.5, M20–M25 4.0, M30–M60 5.0, M65+ 6.0 N/mm².",
+                    "hi": "f'ck = fck + 1.65 S या fck + X, इनमें जो अधिक हो। X (तालिका 1): M10–M15 5.0, M20–M25 5.5, M30–M60 6.5, M65+ 8.0। अनुमानित S (तालिका 2): M10–M15 3.5, M20–M25 4.0, M30–M60 5.0, M65+ 6.0 N/mm²।",
+                },
+            },
+            {
+                "number": "5.1",
+                "title": {"en": "Selection of water-cement ratio", "hi": "जल-सीमेंट अनुपात का चयन"},
+                "summary": {
+                    "en": "Preliminary free w/c from the strength relationship (Fig. 1); the lower of this and the durability limit (IS 456 Table 5) is adopted.",
+                    "hi": "सामर्थ्य संबंध (चित्र 1) से प्रारंभिक मुक्त w/c; इस तथा टिकाऊपन सीमा (IS 456 तालिका 5) में से जो कम हो वह अपनाया जाता है।",
+                },
+            },
+            {
+                "number": "5.2",
+                "title": {"en": "Estimation of air content (Table 3)", "hi": "वायु-अंश का अनुमान (तालिका 3)"},
+                "summary": {
+                    "en": "Entrapped air (non-air-entrained): 10 mm 1.5%, 20 mm 1.0%, 40 mm 0.8% of concrete volume.",
+                    "hi": "फँसी वायु (वायु-संवाहित रहित): 10 मिमी 1.5%, 20 मिमी 1.0%, 40 मिमी 0.8% (कंक्रीट आयतन का)।",
+                },
+            },
+            {
+                "number": "5.3",
+                "title": {"en": "Selection of water content (Table 4)", "hi": "जल मात्रा का चयन (तालिका 4)"},
+                "summary": {
+                    "en": "Water content for angular aggregate at 50 mm slump: 10 mm 208, 20 mm 186, 40 mm 165 kg/m³. Adjust −10/−15/−20 kg for sub-angular/gravel/rounded; ±3% per 25 mm change in slump.",
+                    "hi": "कोणीय गिट्टी हेतु 50 मिमी स्लंप पर जल मात्रा: 10 मिमी 208, 20 मिमी 186, 40 मिमी 165 kg/m³। उप-कोणीय/बजरी/गोल हेतु −10/−15/−20 किग्रा; स्लंप में प्रति 25 मिमी परिवर्तन पर ±3%।",
+                },
+            },
+            {
+                "number": "5.4",
+                "title": {"en": "Calculation of cement/cementitious content", "hi": "सीमेंट/सीमेंटीशियस मात्रा की गणना"},
+                "summary": {
+                    "en": "Cement content = water content / w-c ratio; adopt the greater of this and the durability minimum (IS 456 Table 5).",
+                    "hi": "सीमेंट मात्रा = जल मात्रा / w-c अनुपात; इस तथा टिकाऊपन न्यूनतम (IS 456 तालिका 5) में से जो अधिक हो वह अपनाएँ।",
+                },
+            },
+            {
+                "number": "5.5",
+                "title": {"en": "Estimation of coarse aggregate proportion (Table 5)", "hi": "मोटी गिट्टी अनुपात का अनुमान (तालिका 5)"},
+                "summary": {
+                    "en": "Volume of coarse aggregate per unit volume of total aggregate at w/c = 0.5 (e.g. 20 mm: Zone IV 0.66, III 0.64, II 0.62, I 0.60). Increase 0.01 for every 0.05 decrease in w/c, decrease 0.01 for every 0.05 increase.",
+                    "hi": "w/c = 0.5 पर कुल गिट्टी के प्रति इकाई आयतन मोटी गिट्टी का आयतन (जैसे 20 मिमी: ज़ोन IV 0.66, III 0.64, II 0.62, I 0.60)। w/c में प्रत्येक 0.05 कमी पर 0.01 बढ़ाएँ, प्रत्येक 0.05 वृद्धि पर 0.01 घटाएँ।",
+                },
+            },
+            {
+                "number": "5.7",
+                "title": {"en": "Estimation of fine and coarse aggregate contents", "hi": "बारीक एवं मोटी गिट्टी मात्रा का अनुमान"},
+                "summary": {
+                    "en": "Absolute-volume method: subtract the absolute volumes of cement, water and air from unit volume; split the remainder between coarse and fine aggregate by the proportion from 5.5.",
+                    "hi": "निरपेक्ष-आयतन विधि: इकाई आयतन से सीमेंट, जल एवं वायु के निरपेक्ष आयतन घटाएँ; शेष को 5.5 के अनुपात से मोटी एवं बारीक गिट्टी में बाँटें।",
+                },
+            },
+            {
+                "number": "5.8",
+                "title": {"en": "Trial mixes", "hi": "परीक्षण मिश्रण"},
+                "summary": {
+                    "en": "Calculated proportions shall be checked by trial batches; adjust water/admixture, then vary w/c by ±10% for confirmation mixes.",
+                    "hi": "परिकलित अनुपात परीक्षण बैचों से जाँचे जाएँ; जल/मिश्रण समायोजित करें, फिर पुष्टि हेतु w/c में ±10% परिवर्तन करें।",
+                },
+            },
         ],
     },
 }

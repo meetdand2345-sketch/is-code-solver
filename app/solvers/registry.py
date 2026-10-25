@@ -8,7 +8,7 @@ The registry is the single source of truth for:
 
 import re
 
-from . import column, development, flexure, loads, shear, slab
+from . import column, development, flexure, loads, mix_design, shear, slab
 from .common import t
 
 # ---------------------------------------------------------------------------
@@ -21,6 +21,7 @@ SOLVERS = {
     development.TYPE: development.solve,
     loads.TYPE: loads.solve,
     column.TYPE: column.solve,
+    mix_design.TYPE: mix_design.solve,
 }
 
 
@@ -136,6 +137,32 @@ PROBLEM_TYPES = {
             _f("Asc", "Provided steel Asc (optional)", "प्रदत्त स्टील Asc (वैकल्पिक)", "mm²", required=False),
         ],
     },
+    mix_design.TYPE: {
+        "id": mix_design.TYPE,
+        "title": t("Concrete mix proportioning (IS 10262)", "कंक्रीट मिश्रण अनुपातन (IS 10262)"),
+        "summary": t("Target strength, w/c, water, cement and aggregate contents per IS 10262:2019.",
+                     "IS 10262:2019 अनुसार लक्ष्य सामर्थ्य, w/c, जल, सीमेंट एवं गिट्टी मात्रा।"),
+        "fields": [
+            _f("grade", "Grade of concrete", "कंक्रीट ग्रेड", "", ftype="select",
+               options=[_opt(f"M{v}", f"M{v}", f"M{v}") for v in [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]]),
+            _f("msa", "Nominal max. size of aggregate", "गिट्टी का नाममात्र अधिकतम आकार", "mm", ftype="select",
+               options=[_opt(v, f"{v} mm", f"{v} मिमी") for v in [10, 20, 40]]),
+            _f("slump", "Slump (workability)", "स्लंप (कार्यशीलता)", "mm", required=False),
+            _f("zone", "Fine aggregate grading zone", "बारीक गिट्टी ग्रेडिंग ज़ोन", "", ftype="select",
+               options=[_opt(z, f"Zone {z}", f"ज़ोन {z}") for z in ["I", "II", "III", "IV"]]),
+            _f("exposure", "Exposure condition", "अनावरण स्थिति", "", ftype="select",
+               options=[_opt("mild", "Mild", "सौम्य"), _opt("moderate", "Moderate", "मध्यम"),
+                        _opt("severe", "Severe", "कठोर"), _opt("very_severe", "Very severe", "अति कठोर"),
+                        _opt("extreme", "Extreme", "अति तीव्र")]),
+            _f("agg_shape", "Coarse aggregate shape", "मोटी गिट्टी आकार", "", required=False, ftype="select",
+               options=[_opt("angular", "Angular (crushed)", "कोणीय (कुचली)"),
+                        _opt("sub_angular", "Sub-angular", "उप-कोणीय"),
+                        _opt("gravel", "Gravel + crushed", "बजरी + कुचली"),
+                        _opt("rounded", "Rounded gravel", "गोल बजरी")]),
+            _f("wc", "Preliminary free w/c (from Fig. 1)", "प्रारंभिक मुक्त w/c (चित्र 1 से)", "", required=False),
+            _f("admix", "Admixture water reduction", "मिश्रण जल कमी", "%", required=False),
+        ],
+    },
 }
 
 
@@ -166,6 +193,8 @@ KEYWORDS = {
                  "dead load": 1, "live load": 1, "गुणित भार": 4, "भार संयोजन": 4,
                  "स्थायी भार": 1, "चल भार": 1},
     column.TYPE: {"column": 2, "axial": 3, "स्तंभ": 2, "कॉलम": 2, "अक्षीय": 3},
+    mix_design.TYPE: {"mix design": 4, "mix proportion": 4, "concrete mix": 4, "proportioning": 3,
+                      "target strength": 3, "मिश्रण अनुपात": 4, "कंक्रीट मिश्रण": 4},
 }
 
 # parameter aliases -> canonical name (case-sensitive where it matters: d vs D)
@@ -252,6 +281,21 @@ def extract_params(question):
     m2 = re.search(r"(\d+(?:\.\d+)?)\s*mm\s*(?:dia|diameter|bar|φ)", q, re.IGNORECASE)
     if m2 and "phi" not in params:
         params["phi"] = float(m2.group(1))
+
+    # mix-design specific tokens
+    mg = re.search(r"\bM\s?(\d{2,3})\b", q)
+    if mg:
+        params.setdefault("grade", f"M{int(mg.group(1))}")
+    msa = re.search(r"(\d+(?:\.\d+)?)\s*mm\s+(?:nominal\s+)?(?:max\w*\s+)?(?:size\s+)?(?:of\s+)?(?:coarse\s+)?aggregate",
+                    q, re.IGNORECASE)
+    if msa:
+        params.setdefault("msa", float(msa.group(1)))
+    mz = re.search(r"zone[\s\-:]*([IVX]+)", q, re.IGNORECASE)
+    if mz:
+        params.setdefault("zone", mz.group(1).upper())
+    me = re.search(r"\b(very\s*severe|severe|moderate|mild|extreme)\b", q, re.IGNORECASE)
+    if me:
+        params.setdefault("exposure", re.sub(r"\s+", "_", me.group(1).lower()))
 
     # bar_type / condition / support hints
     if re.search(r"plain|mild", q, re.IGNORECASE):
