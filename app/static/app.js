@@ -28,6 +28,14 @@ const UI = {
     no_match: "No matching problem type.",
     solving: "Solving…",
     loading: "Loading…",
+    upload_label: "…or upload a photo / scan of the question (OCR)",
+    ocr_running: "Reading the image…",
+    detected_text: "Text read from the image",
+    detected_params: "Values recognised",
+    numbers_found: "Numbers found in the image",
+    detected_type: "Detected problem",
+    load_form: "Open in Design Tools",
+    ocr_notes: "Notes",
   },
   hi: {
     ask_label: "अपना अभियांत्रिकी प्रश्न लिखें",
@@ -51,6 +59,14 @@ const UI = {
     no_match: "कोई मेल खाती समस्या नहीं मिली।",
     solving: "हल हो रहा है…",
     loading: "लोड हो रहा है…",
+    upload_label: "…या प्रश्न की फ़ोटो / स्कैन अपलोड करें (OCR)",
+    ocr_running: "छवि पढ़ी जा रही है…",
+    detected_text: "छवि से पढ़ा गया पाठ",
+    detected_params: "पहचाने गए मान",
+    numbers_found: "छवि में मिले अंक",
+    detected_type: "पहचानी गई समस्या",
+    load_form: "अभिकल्प उपकरण में खोलें",
+    ocr_notes: "टिप्पणियाँ",
   },
 };
 
@@ -77,7 +93,11 @@ function setLang(lang) {
   renderLibrary();
   const ar = document.getElementById("ask-result");
   const tr = document.getElementById("tool-result");
-  if (ar.dataset.raw) ar.innerHTML = renderSolution(JSON.parse(ar.dataset.raw));
+  if (ar.dataset.raw) {
+    ar.innerHTML = (ar.dataset.kind === "image")
+      ? renderImageResult(JSON.parse(ar.dataset.raw))
+      : renderSolution(JSON.parse(ar.dataset.raw));
+  }
   if (tr.dataset.raw) tr.innerHTML = renderSolution(JSON.parse(tr.dataset.raw));
 }
 
@@ -261,6 +281,98 @@ function renderLibrary() {
       <div class="clause-list">${clauses}</div>
     </div>`;
   }).join("");
+}
+
+/* ---- image / OCR ------------------------------------------------------- */
+async function uploadImage(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const out = document.getElementById("ask-result");
+  out.innerHTML = `<div class="card">${ui("ocr_running")}</div>`;
+  try {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/ask-image", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Error");
+    window.__lastImage = data;
+    out.dataset.raw = JSON.stringify(data);
+    out.dataset.kind = "image";
+    out.innerHTML = renderImageResult(data);
+  } catch (e) {
+    out.innerHTML = `<div class="warnings"><b>${ui("no_match")}</b><br>${escapeHtml(e.message)}</div>`;
+  } finally {
+    ev.target.value = "";
+  }
+}
+
+function renderImageResult(d) {
+  const notes = (d.notes || []).map((n) => `<li>${escapeHtml(L(n))}</li>`).join("");
+  const params = Object.entries(d.params || {})
+    .map(([k, v]) => `<div class="input-pill"><b>${escapeHtml(k)}</b>${escapeHtml(String(v))}</div>`).join("");
+  const nums = (d.numbers || []).map((n) => `<span class="chip">${escapeHtml(n.text)}</span>`).join(" ");
+  const missing = (d.missing_fields || [])
+    .map((f) => `<li>${escapeHtml(L(f.label))}${f.unit ? ` (${f.unit})` : ""}</li>`).join("");
+
+  const textBlock = d.text
+    ? `<div class="field-label">${ui("detected_text")}</div><div class="formula">${escapeHtml(d.text)}</div>`
+    : "";
+  const typeBlock = d.problem_type
+    ? `<div class="field-label">${ui("detected_type")}</div><div class="input-pill"><b>${escapeHtml(ui("detected_type"))}</b>${escapeHtml(L(d.title))}</div>`
+    : "";
+  const paramsBlock = params
+    ? `<div class="field-label">${ui("detected_params")}</div><div class="inputs-grid">${params}</div>`
+    : "";
+  const numsBlock = nums
+    ? `<div class="field-label">${ui("numbers_found")}</div><div class="examples">${nums}</div>`
+    : "";
+  const missingBlock = missing
+    ? `<div class="warnings"><b>${ui("need")}</b><ul>${missing}</ul></div>`
+    : "";
+  const notesBlock = notes
+    ? `<div class="warnings"><b>${ui("ocr_notes")}</b><ul>${notes}</ul></div>`
+    : "";
+  const btn = d.problem_type
+    ? `<button class="primary" onclick="loadLastImage()">${ui("load_form")}</button>`
+    : "";
+
+  return `<div class="card">
+    <div class="solution-head"><h2>${escapeHtml(L(d.message) || "")}</h2></div>
+    ${notesBlock}
+    ${textBlock}
+    ${typeBlock}
+    ${paramsBlock}
+    ${numsBlock}
+    ${missingBlock}
+    <div class="row">${btn}</div>
+  </div>`;
+}
+
+function loadLastImage() {
+  const d = window.__lastImage;
+  if (!d) return;
+  loadIntoForm(d.problem_type, d.params || {});
+}
+
+function loadIntoForm(ptype, params) {
+  if (ptype) {
+    document.getElementById("ptype").value = ptype;
+    renderForm();
+  }
+  const pdef = PROBLEM_TYPES.find((p) => p.id === ptype);
+  if (pdef) {
+    pdef.fields.forEach((f) => {
+      const el = document.getElementById("in-" + f.name);
+      if (!el || params[f.name] === undefined || params[f.name] === null) return;
+      const v = params[f.name];
+      if (f.type === "select") {
+        if ([...el.options].some((o) => String(o.value) === String(v))) el.value = String(v);
+      } else {
+        el.value = v;
+      }
+    });
+  }
+  showTab("tools");
 }
 
 function escapeHtml(s) {

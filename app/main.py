@@ -18,14 +18,17 @@ POST /api/ask              -> parse a free-text question and answer it
 
 import os
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .codes import library
+from .ocr import extract as ocr_extract
 from .solvers import registry
 from .solvers.common import t
+
+MAX_IMAGE_BYTES = 12 * 1024 * 1024
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -100,7 +103,8 @@ def _enrich(solution):
 @app.get("/api/health")
 def health():
     return {"status": "ok", "codes": len(library.list_codes()),
-            "problem_types": len(registry.list_problem_types())}
+            "problem_types": len(registry.list_problem_types()),
+            "ocr": True}
 
 
 @app.get("/api/codes")
@@ -180,6 +184,21 @@ def post_ask(req: AskRequest):
         raise HTTPException(status_code=422, detail=str(exc))
     solution["parsed_from"] = question
     return _enrich(solution)
+
+
+@app.post("/api/ask-image")
+async def post_ask_image(file: UploadFile = File(...)):
+    """OCR an uploaded image and return candidate problem type + parameters.
+
+    Never auto-solves — returns values for the user to confirm.
+    """
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty file")
+    if len(data) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413,
+                            detail=f"Image too large (max {MAX_IMAGE_BYTES // (1024*1024)} MB)")
+    return ocr_extract.parse_image(data)
 
 
 @app.get("/")

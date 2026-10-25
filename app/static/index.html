@@ -38,6 +38,10 @@
           <button class="primary" onclick="askQuestion()" data-i18n="ask_btn">Solve</button>
           <span class="hint" data-i18n="ask_hint">Mention the member and the values you know (e.g. b=300, fck=25, Mu=120 kNm).</span>
         </div>
+        <div class="upload-row">
+          <label class="field-label" for="img" data-i18n="upload_label">…or upload a photo / scan of the question (OCR)</label>
+          <input type="file" id="img" accept="image/*" onchange="uploadImage(event)" />
+        </div>
         <div class="examples">
           <span data-i18n="examples_label">Try:</span>
           <button class="chip" onclick="fillExample(this)">Design a slab, span 4 m, live load 3 kN/m2, fck 25, fy 500</button>

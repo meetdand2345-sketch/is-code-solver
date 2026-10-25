@@ -17,6 +17,9 @@ so the numbers and clause references are reproducible and auditable.
   *"Design a simply supported beam, b=300 mm, D=500 mm, fck=25, fy=500, Mu=120 kNm"*.
   The app detects the problem type, extracts the values, and returns the full solution.
   If values are missing, it tells you exactly which ones it needs.
+- **Upload a photo / scan** of the question (OCR). The app reads the text off the image,
+  recognises the problem type and pulls out the values, then offers to load them into the
+  Design Tools form for you to confirm before solving. It never auto-solves from an image.
 - **Design Tools** — pick a problem and fill a form for a guaranteed precise solve.
 - **IS Code Library** — the codes the app draws on, with clause summaries and links to a
   public reference copy and the official BIS source.
@@ -73,6 +76,7 @@ pytest -q
 | GET | `/api/problem-types` | Catalogue + form fields |
 | POST | `/api/solve` | `{"type": "...", "inputs": {...}, "lang": "en"}` |
 | POST | `/api/ask` | `{"question": "...", "lang": "hi"}` |
+| POST | `/api/ask-image` | `multipart/form-data` with an image `file` → OCR'd candidate values (no auto-solve) |
 
 Example:
 
@@ -100,6 +104,7 @@ The repo includes a `Dockerfile` and a `render.yaml` blueprint.
 app/
   main.py            FastAPI app and routes
   codes/library.py   IS code metadata, clause index, open-links
+  ocr/extract.py     image → OCR → candidate values (never auto-solves)
   solvers/
     common.py        shared helpers + IS 456 tables (19, 20, bond, xu,max)
     registry.py      problem-type catalogue, dispatcher, question parser
@@ -107,6 +112,30 @@ app/
   static/            index.html, style.css, app.js (the web UI)
 tests/               pytest suite
 ```
+
+## Reading images (OCR)
+
+Paste a photo or scan into the **Ask** tab, or POST it to `/api/ask-image`. The image is read
+by a local OCR engine ([RapidOCR](https://github.com/RapidAI/RapidOCR), ONNX Runtime — no
+cloud service, no API key) and the recognised text goes through the *same* parser the typed
+textbox uses.
+
+Engineering drawings are easy to misread, so the OCR path is **assistive, not automatic**:
+it returns candidate values plus every number it found, flags what's still missing, and offers
+a one-click *Open in Design Tools* so you confirm each value before it is used. A misread
+dimension therefore can't silently become a design.
+
+Notes and limits:
+
+- Works best on clean, upright, printed text. Handwriting, rotated text, and dimension lines
+  on a figure are read unreliably; the angle classifier is disabled for stability, so text
+  that is upside-down may not be corrected.
+- A bare cross-section with unlabelled dimensions (just `300` and `500` beside a rectangle)
+  can't be mapped to width vs. depth automatically — the numbers are surfaced for you to place.
+- The OCR engine is a large dependency (ONNX Runtime + OpenCV). It is optional at the code
+  level — the text and form paths work without it — but it ships in `requirements.txt`.
+- The engine is run single-threaded with retries; if the environment can't load it, image
+  upload returns a clean error and everything else keeps working.
 
 ## Scope and correctness notes
 

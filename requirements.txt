@@ -1,3 +1,10 @@
 fastapi>=0.110
 uvicorn[standard]>=0.27
 pydantic>=2.0
+python-multipart>=0.0.9
+# OCR (image questions) — pure pip, no system packages needed.
+# Pinned to a widely-tested combo; opencv-python 5.x / numpy 2.x are very new.
+rapidocr-onnxruntime>=1.3,<2
+opencv-python<5
+numpy>=1.24,<2
+pillow>=10.0
